@@ -1,0 +1,40 @@
+import tensorflow.keras as keras
+import tensorflow as tf
+import matplotlib.pyplot as plt
+
+mnist = tf.keras.datasets.mnist
+
+(x_train, y_train),(x_test, y_test) = mnist.load_data()
+
+#normalize data-set it from range of 0-255 to 0-1
+x_train = tf.keras.utils.normalize(x_train, axis=1)
+x_test = tf.keras.utils.normalize(x_test, axis=1)
+
+#means our model will go forward through the data, in a direct order
+model = tf.keras.models.Sequential()
+
+#input layer, flattens data (puts all data into one single array?) 
+model.add(tf.keras.layers.Flatten())
+
+#hidden layers, a 'dense' layer where every neuron has a weighted
+#connection with each past and future node
+#rely stands for rectified linear, and it acts as the activation function (default to relu)
+model.add(tf.keras.layers.Dense(128,activation=tf.nn.relu))
+
+#add a second layer just to get better predicitons
+model.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
+
+#output layer, it has 10 nodes, 1 for each number possible 
+model.add(tf.keras.layers.Dense(10,activation=tf.nn.softmax))
+
+#adam is just a good starting optimizer
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+model.fit(x_train, y_train, epochs=3)
+
+val_loss, val_acc = model.evaluate(x_test, y_test)
+print(val_loss)
+print(val_acc)
+
+model.save('it_read_num_bro.model')
